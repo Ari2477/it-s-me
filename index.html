@@ -191,21 +191,17 @@
       </div>
 
       <div style="margin-top:12px" class="contact-icons">
-        <a href="https://github.com/yourgithub" target="_blank"><i class="fab fa-github" style="font-size:1.6rem;color:var(--accent)"></i></a>
-        <a href="https://facebook.com/yourfacebook" target="_blank"><i class="fab fa-facebook" style="font-size:1.6rem;color:var(--accent)"></i></a>
+        <a href="https://github.com/Ari2477" target="_blank"><i class="fab fa-github" style="font-size:1.6rem;color:var(--accent)"></i></a>
+        <a href="https://facebook.com/61577110900436" target="_blank"><i class="fab fa-facebook" style="font-size:1.6rem;color:var(--accent)"></i></a>
       </div>
     </section>
 
     <footer>⛏️ ARI High-Tech Minecraft Portfolio © <span id="year">2025</span></footer>
   </div>
 
-  <!-- Achievement popup -->
   <div class="achievement" id="achievement">🏆 Achievement Unlocked!</div>
 
   <script>
-    /* -------------------------
-       Simple WebAudio helpers (no external files)
-       ------------------------- */
     const AudioCtx = (window.AudioContext || window.webkitAudioContext) ? new (window.AudioContext || window.webkitAudioContext)() : null;
     function beep(freq=440,duration=0.08, type='sine', gain=0.12) {
       if(!AudioCtx) return;
@@ -220,16 +216,13 @@
     function playAchievement(){ beep(520,0.14,'triangle',0.22); setTimeout(()=>beep(780,0.14,'sine',0.14),120) }
     function playOpen(){ beep(220,0.07,'sine',0.08); beep(330,0.07,'sine',0.06) }
 
-    /* -------------------------
-       Particles (XP or Nether mode)
-       ------------------------- */
     const canvas = document.getElementById('particles');
     const ctx = canvas.getContext('2d');
     function resizeCanvas(){ canvas.width = innerWidth; canvas.height = innerHeight }
     window.addEventListener('resize', resizeCanvas); resizeCanvas();
 
     let particles = [];
-    let mode = 'normal' // normal | nether
+    let mode = 'normal' 
     function spawnParticles(n=40){
       particles = [];
       for(let i=0;i<n;i++){
@@ -262,9 +255,6 @@
     }
     draw();
 
-    /* -------------------------
-       XP / Levels / Achievements (persistent)
-       ------------------------- */
     const XP_TO_LEVEL = 100;
     const xpFill = document.getElementById('xpFill');
     const xpText = document.getElementById('xpText');
@@ -275,7 +265,6 @@
       level: 1,
       achievements: {}
     };
-    // load from storage
     try{
       const saved = JSON.parse(localStorage.getItem('ari_portfolio_state')||'null');
       if(saved){ state = {...state, ...saved} }
@@ -294,11 +283,9 @@
 
     function grantXP(amount=10, reason='') {
       state.xp += amount;
-      // level up
       while(state.xp >= XP_TO_LEVEL){
         state.xp -= XP_TO_LEVEL;
         state.level += 1;
-        // show level up achievement
         showAchievement(`Level Up! You are now Level ${state.level}`);
         playAchievement();
       }
@@ -313,9 +300,6 @@
       setTimeout(()=> a.classList.remove('show'),4000);
     }
 
-    /* -------------------------
-       Terminal / Commands
-       ------------------------- */
     const terminal = document.getElementById('terminal');
     const input = document.getElementById('cmdInput');
     const sendBtn = document.getElementById('cmdSend');
@@ -345,7 +329,6 @@
         document.getElementById('contact').scrollIntoView({behavior:'smooth'});
         grantXP(6,'Opened Contact');
       } else if(base === '/unlock'){
-        // unlock ender chest
         if(state.achievements['enderUnlocked']){
           pushTerminal('Ender Chest already unlocked.');
         } else {
@@ -358,7 +341,6 @@
           grantXP(30,'Unlocked Ender Chest');
         }
       } else if(base === '/dance'){
-        // Nether mode toggle for 12s
         mode = 'nether'; spawnParticles(90);
         showAchievement('Dance mode: Nether Portal!');
         playXP(); playAchievement();
@@ -377,20 +359,15 @@
 
     sendBtn.addEventListener('click', ()=>{ handleCommand(input.value); input.value=''; input.focus() });
     input.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ handleCommand(input.value); input.value=''; } });
-
-    // initial welcome messages
+    
     (function bootMessages(){
       pushTerminal('> Connecting to ARI’s Server...');
       setTimeout(()=>{ pushTerminal('> Login successful!'); },500);
       setTimeout(()=>{ pushTerminal('> Type /help for available commands.'); },900);
     })();
 
-    /* -------------------------
-       Interactions: clicking slots, scrolling => XP & achievements
-       ------------------------- */
     document.querySelectorAll('.project').forEach(el=>{
       el.addEventListener('click', (e)=>{
-        // if anchor link - allow default navigation but grant XP
         const name = el.dataset.name || el.textContent.trim();
         grantXP(12, `Interacted with ${name}`);
         showAchievement(`Interacted: ${name}`);
@@ -399,7 +376,6 @@
       el.addEventListener('mouseenter', ()=> playXP());
     });
 
-    // scroll achievements
     let scrolledProjects=false;
     window.addEventListener('scroll', ()=>{
       const proj = document.getElementById('projects');
@@ -411,7 +387,6 @@
       }
     });
 
-    // Show achievements list button
     const showAchievementsBtn = document.getElementById('showAchievements');
     showAchievementsBtn.addEventListener('click', ()=>{
       const ach = state.achievements;
@@ -420,7 +395,6 @@
       grantXP(6,'Checked Achievements');
     });
 
-    // Reset progress (for testing)
     document.getElementById('resetProgress').addEventListener('click', ()=>{
       if(confirm('Reset local progress?')){
         state = {xp:0,level:1,achievements:{}};
@@ -430,12 +404,9 @@
       }
     });
 
-    /* -------------------------
-       Server mock: update players and ping every few seconds
-       ------------------------- */
     const names = ['Explorer42','CoderCat','BlockSmith','Guest','NetRunner','ARI','PixelPunk'];
     function updateServerMock(){
-      const count = Math.floor(1 + Math.random()*6); // 1-6
+      const count = Math.floor(1 + Math.random()*6); 
       const players = [];
       while(players.length < count){
         const pick = names[Math.floor(Math.random()*names.length)];
@@ -448,9 +419,6 @@
     }
     updateServerMock(); setInterval(updateServerMock, 5000);
 
-    /* -------------------------
-       Achievement for first visit (if not given)
-       ------------------------- */
     if(!state.achievements['welcome']){
       state.achievements['welcome'] = true;
       saveState();
@@ -459,15 +427,11 @@
       grantXP(15,'First Visit');
     }
 
-    /* -------------------------
-       Simple click sound and download action for CV button
-       ------------------------- */
     document.querySelectorAll('.slot').forEach(s=>{
       s.addEventListener('click',(e)=>{
-        // If this is download CV slot (check icon class)
         if(s.querySelector('.fa-download')){
           playOpen();
-          // simulate download by opening data URL with small resume text
+        
           const blob = new Blob([`ARI — Resume\n\nFull Stack Dev · Portfolio: ARI\n\n(Download simulation)`], {type:'text/plain'});
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a'); a.href=url; a.download='ARI_Resume.txt'; document.body.appendChild(a); a.click(); a.remove();
@@ -476,33 +440,21 @@
       });
     });
 
-    /* -------------------------
-       Simple seed to persist the Ender chest display if previously unlocked
-       ------------------------- */
     if(state.achievements['enderUnlocked']){
       document.getElementById('enderChest').classList.add('show');
     } else {
       document.getElementById('enderChest').classList.add('hidden');
     }
 
-    /* -------------------------
-       Small UX: clicking nav anchors will grant small XP
-       ------------------------- */
     document.querySelectorAll('nav a').forEach(a=>{
       a.addEventListener('click', ()=> grantXP(4,'Used Nav'));
     });
 
-    /* -------------------------
-       Extra: clicking on player avatar gives secret XP
-       ------------------------- */
     document.querySelector('#profile img').addEventListener('click', ()=>{
       grantXP(20,'Pet the Avatar');
       showAchievement('You petted ARI!');
     });
 
-    /* -------------------------
-       Allow pressing Enter anywhere to focus terminal input
-       ------------------------- */
     window.addEventListener('keydown', (e)=>{
       if(e.key === 'Enter' && document.activeElement !== input){
         input.focus();
