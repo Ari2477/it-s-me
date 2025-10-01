@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ARI — Minecraft Portfolio</title>
+  <link href="https://fonts.cdnfonts.com/css/minecraft-4" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root{
+      --accent:#00ffcc;
+      --accent-2:#00ffaa;
+      --bg1:#070707;
+      --panel: rgba(0,0,0,0.7);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{
+      font-family:'Minecraft', monospace;
+      background: radial-gradient(circle at center, #050505, #111 60%, #000);
+      color:#fff;
+      -webkit-font-smoothing:antialiased;
+      text-align:center;
+      overflow-x:hidden;
+      cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><circle cx="12" cy="12" r="10" stroke="%2300ffcc" stroke-width="2" fill="transparent"/></svg>') 12 12, auto;
+    }
+
+    canvas#particles{position:fixed;inset:0;z-index:-3}
+
+    header{padding:18px;font-size:1.9rem;text-shadow:0 0 14px var(--accent)}
+    nav{
+      position:sticky;top:0;background:rgba(0,0,0,0.6);display:flex;gap:10px;justify-content:center;padding:10px;border-bottom:2px solid var(--accent);z-index:20
+    }
+    nav a{background:#121212;border:2px solid var(--accent);padding:8px 18px;color:var(--accent);text-decoration:none;border-radius:6px;transition:all .22s}
+    nav a:hover{background:var(--accent);color:#000;transform:scale(1.06);box-shadow:0 0 14px var(--accent)}
+
+    .container{max-width:1100px;margin:18px auto;padding:8px}
+    section{background:var(--panel);margin:18px;border:2px solid var(--accent);border-radius:10px;padding:16px;box-shadow:0 0 18px rgba(0,255,204,0.05)}
+    h2{font-size:1.25rem;margin-bottom:10px;text-shadow:0 0 8px var(--accent)}
+
+    #profile img{border:3px solid var(--accent);border-radius:8px;margin-top:10px}
+
+    .inventory{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:12px;padding:12px;background:#0b0b0b;border-radius:8px}
+    .slot{background:#141414;border:2px solid #0f0f0f;aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;border-radius:6px;transition:transform .25s,box-shadow .25s}
+    .slot .icon{font-size:1.6rem;transform-origin:center center;animation:spin 6s linear infinite}
+    .slot span{font-size:.8rem;margin-top:6px}
+    .slot:hover{transform:translateY(-6px) scale(1.05);box-shadow:0 0 18px rgba(0,255,204,0.12);border-color:var(--accent)}
+    @keyframes spin{0%{transform:rotateY(0deg)}50%{transform:rotateY(180deg)}100%{transform:rotateY(360deg)}}
+
+    .slot.chest::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent)}
+    .slot.hidden{filter:grayscale(100%);opacity:.45}
+
+    .xp-box{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center}
+    .xp-bar{width:320px;background:#151515;border:2px solid var(--accent);height:18px;border-radius:99px;overflow:hidden;position:relative}
+    .xp-fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width .8s}
+    .level-badge{background:#0b0b0b;border:2px solid var(--accent);padding:6px 10px;border-radius:8px}
+
+    .chatbox{background:#000;padding:12px;border-radius:8px;border:2px solid var(--accent);font-family:monospace;text-align:left;height:200px;overflow:auto;line-height:1.4;white-space:pre-wrap}
+    .terminal-input{display:flex;gap:8px;margin-top:8px}
+    .terminal-input input{flex:1;padding:8px;border-radius:6px;border:2px solid #111;background:#080808;color:var(--accent);outline:none}
+    .terminal-input button{padding:8px 12px;border-radius:6px;border:2px solid var(--accent);background:#0a0a0a;color:var(--accent);cursor:pointer}
+
+    .achievement{position:fixed;left:-400px;top:20px;background:rgba(0,0,0,0.95);border:2px solid var(--accent);padding:10px 14px;border-radius:8px;box-shadow:0 0 22px rgba(0,255,204,0.15);z-index:999;transition:left .6s}
+    .achievement.show{left:20px}
+
+    .server{display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap}
+    .server .card{padding:10px 12px;border-radius:8px;border:2px solid var(--accent);background:#050505}
+
+    .ender{display:none}
+    .ender.show{display:block}
+
+    footer{padding:14px;font-size:.85rem;opacity:.8}
+
+.contact-icons {
+  display: flex;
+  justify-content: center; 
+  gap: 30px; 
+  font-size: 1.8rem; 
+}
+
+.contact-icons a {
+  color: white;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.contact-icons a:hover {
+  transform: scale(1.2);
+  color: lime;
+}
+
+
+    /* small responsive */
+    @media (max-width:600px){
+      nav{flex-wrap:wrap}
+      .xp-bar{width:220px}
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particles"></canvas>
+
+  <header>🌍 ARI’s World — Portfolio Lobby</header>
+  <nav>
+    <a href="#profile">About</a>
+    <a href="#projects">Projects</a>
+    <a href="#xp">XP</a>
+    <a href="#contact">Contact</a>
+    <a href="#server">Server</a>
+  </nav>
+
+  <div class="container">
+    <section id="profile">
+      <h2>👤 Player Profile</h2>
+      <p>Name: <strong>ARI</strong> • Role: Developer / Creator</p>
+      <div style="display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap">
+        <div>
+          <img src="https://mc-heads.net/avatar/Notch/120" alt="skin" width="120" height="120">
+        </div>
+        <div style="text-align:left;min-width:220px">
+          <p id="bio">Hello! I'm ARI — I build projects inspired by games, UX and automation.</p>
+          <div class="xp-box" style="margin-top:10px">
+            <div class="level-badge">Level <span id="level">1</span></div>
+            <div class="xp-bar" title="XP bar">
+              <div class="xp-fill" id="xpFill"></div>
+            </div>
+            <div class="level-badge"><span id="xpText">0 / 100 XP</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects">
+      <h2>📦 Inventory (Projects)</h2>
+      <div class="inventory">
+        <a class="slot project" data-name="AutoBot" href="https://automated-bot-quso.onrender.com" target="_blank" title="AutoBot — click to open">
+          <i class="fas fa-robot icon"></i>
+          <span>AutoBot</span>
+        </a>
+        <a class="slot project" data-name="ShareBoost" href="https://autoshare-6zos.onrender.com" target="_blank">
+          <i class="fas fa-bullhorn icon"></i>
+          <span>ShareBoost</span>
+        </a>
+        <a class="slot project" data-name="FollowerBoost" href="https://follower-boost-19bm.onrender.com" target="_blank">
+          <i class="fas fa-users icon"></i>
+          <span>FollowerBoost</span>
+        </a>
+        <div class="slot chest project" data-name="Resource Pack (Resume)">
+          <i class="fas fa-download icon"></i>
+          <span>Download CV</span>
+        </div>
+
+        <div class="slot ender" id="enderChest">
+          <i class="fas fa-cube icon"></i>
+          <span>Ender Chest (Secret)</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="server">
+      <h2>🌐 Server Status</h2>
+      <div class="server">
+        <div class="card">
+          <div><strong id="serverState">Online ✅</strong></div>
+          <div>Ping: <span id="ping">42ms</span></div>
+        </div>
+        <div class="card">
+          <div>Players online: <span id="playersCount">3</span>/20</div>
+          <div id="playerList" style="margin-top:6px;font-size:.9rem;opacity:.9">ARI, Explorer42, Guest</div>
+        </div>
+        <div class="card">
+          <div>MOTD:</div>
+          <div style="margin-top:6px;font-style:italic">Welcome to ARI’s Portfolio Server</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="xp">
+      <h2>🎯 Achievements & XP</h2>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+        <button id="showAchievements" style="padding:8px 12px;border-radius:8px;border:2px solid var(--accent);background:#080808;color:var(--accent)">Show Achievements</button>
+        <button id="resetProgress" style="padding:8px 12px;border-radius:8px;border:2px solid var(--accent);background:#080808;color:var(--accent)">Reset Progress</button>
+      </div>
+    </section>
+
+    <section id="contact">
+      <h2>💬 Terminal Chat</h2>
+      <div class="chatbox" id="terminal"></div>
+      <div class="terminal-input">
+        <input id="cmdInput" placeholder="Type a command (e.g. /help)" autocomplete="off">
+        <button id="cmdSend">Send</button>
+      </div>
+
+      <div style="margin-top:12px" class="contact-icons">
+        <a href="https://github.com/yourgithub" target="_blank"><i class="fab fa-github" style="font-size:1.6rem;color:var(--accent)"></i></a>
+        <a href="https://facebook.com/yourfacebook" target="_blank"><i class="fab fa-facebook" style="font-size:1.6rem;color:var(--accent)"></i></a>
+      </div>
+    </section>
+
+    <footer>⛏️ ARI High-Tech Minecraft Portfolio © <span id="year">2025</span></footer>
+  </div>
+
+  <!-- Achievement popup -->
+  <div class="achievement" id="achievement">🏆 Achievement Unlocked!</div>
+
+  <script>
+    /* -------------------------
+       Simple WebAudio helpers (no external files)
+       ------------------------- */
+    const AudioCtx = (window.AudioContext || window.webkitAudioContext) ? new (window.AudioContext || window.webkitAudioContext)() : null;
+    function beep(freq=440,duration=0.08, type='sine', gain=0.12) {
+      if(!AudioCtx) return;
+      const o = AudioCtx.createOscillator();
+      const g = AudioCtx.createGain();
+      o.type = type; o.frequency.value = freq;
+      g.gain.value = gain;
+      o.connect(g); g.connect(AudioCtx.destination);
+      o.start(); o.stop(AudioCtx.currentTime + duration);
+    }
+    function playXP(){ beep(880,0.06,'sine',0.06); beep(1320,0.05,'sine',0.04) }
+    function playAchievement(){ beep(520,0.14,'triangle',0.22); setTimeout(()=>beep(780,0.14,'sine',0.14),120) }
+    function playOpen(){ beep(220,0.07,'sine',0.08); beep(330,0.07,'sine',0.06) }
+
+    /* -------------------------
+       Particles (XP or Nether mode)
+       ------------------------- */
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    function resizeCanvas(){ canvas.width = innerWidth; canvas.height = innerHeight }
+    window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+    let particles = [];
+    let mode = 'normal' // normal | nether
+    function spawnParticles(n=40){
+      particles = [];
+      for(let i=0;i<n;i++){
+        particles.push({
+          x: Math.random()*canvas.width,
+          y: Math.random()*canvas.height,
+          r: 1+Math.random()*3,
+          dx: (Math.random()-0.5)*(mode==='normal'?1.2:2.2),
+          dy: (Math.random()-0.5)*(mode==='normal'?1.2:2.2),
+          hue: mode==='normal'?170+Math.random()*20:280+Math.random()*40,
+          a: 0.08+Math.random()*0.4
+        });
+      }
+    }
+    spawnParticles(60);
+
+    function draw(){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      for(const p of particles){
+        ctx.beginPath();
+        const color = `hsla(${p.hue},85%,60%,${p.a})`;
+        ctx.fillStyle = color;
+        ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fill();
+        p.x += p.dx; p.y += p.dy;
+        if(p.x<0||p.x>canvas.width) p.dx *= -1;
+        if(p.y<0||p.y>canvas.height) p.dy *= -1;
+      }
+      requestAnimationFrame(draw);
+    }
+    draw();
+
+    /* -------------------------
+       XP / Levels / Achievements (persistent)
+       ------------------------- */
+    const XP_TO_LEVEL = 100;
+    const xpFill = document.getElementById('xpFill');
+    const xpText = document.getElementById('xpText');
+    const levelEl = document.getElementById('level');
+
+    let state = {
+      xp: 0,
+      level: 1,
+      achievements: {}
+    };
+    // load from storage
+    try{
+      const saved = JSON.parse(localStorage.getItem('ari_portfolio_state')||'null');
+      if(saved){ state = {...state, ...saved} }
+    }catch(e){ console.warn('load failed',e) }
+    function saveState(){ localStorage.setItem('ari_portfolio_state', JSON.stringify(state)) }
+
+    function updateXPUI(){
+      const xp = state.xp % XP_TO_LEVEL;
+      const level = state.level;
+      const percent = (xp / XP_TO_LEVEL)*100;
+      xpFill.style.width = percent + '%';
+      xpText.textContent = `${xp} / ${XP_TO_LEVEL} XP`;
+      levelEl.textContent = level;
+    }
+    updateXPUI();
+
+    function grantXP(amount=10, reason='') {
+      state.xp += amount;
+      // level up
+      while(state.xp >= XP_TO_LEVEL){
+        state.xp -= XP_TO_LEVEL;
+        state.level += 1;
+        // show level up achievement
+        showAchievement(`Level Up! You are now Level ${state.level}`);
+        playAchievement();
+      }
+      updateXPUI(); saveState(); playXP();
+      if(reason) pushTerminal(`Gained ${amount} XP — ${reason}`);
+    }
+
+    function showAchievement(text){
+      const a = document.getElementById('achievement');
+      a.textContent = `🏆 ${text}`;
+      a.classList.add('show');
+      setTimeout(()=> a.classList.remove('show'),4000);
+    }
+
+    /* -------------------------
+       Terminal / Commands
+       ------------------------- */
+    const terminal = document.getElementById('terminal');
+    const input = document.getElementById('cmdInput');
+    const sendBtn = document.getElementById('cmdSend');
+
+    function pushTerminal(msg){
+      const time = new Date().toLocaleTimeString();
+      terminal.innerHTML += `[${time}] ${msg}\n`;
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    function handleCommand(raw){
+      const cmd = raw.trim();
+      pushTerminal('> ' + cmd);
+      if(!cmd) return;
+      const parts = cmd.split(' ');
+      const base = parts[0].toLowerCase();
+
+      if(base === '/help'){
+        pushTerminal("Available: /help, /about, /projects, /contact, /unlock, /dance, /clear, /seed");
+      } else if(base === '/about'){
+        document.getElementById('profile').scrollIntoView({behavior:'smooth'});
+        grantXP(8,'Viewed About');
+      } else if(base === '/projects'){
+        document.getElementById('projects').scrollIntoView({behavior:'smooth'});
+        grantXP(10,'Viewed Projects');
+      } else if(base === '/contact'){
+        document.getElementById('contact').scrollIntoView({behavior:'smooth'});
+        grantXP(6,'Opened Contact');
+      } else if(base === '/unlock'){
+        // unlock ender chest
+        if(state.achievements['enderUnlocked']){
+          pushTerminal('Ender Chest already unlocked.');
+        } else {
+          state.achievements['enderUnlocked']=true;
+          saveState();
+          document.getElementById('enderChest').classList.add('show');
+          document.getElementById('enderChest').classList.remove('hidden');
+          showAchievement('Ender Chest Unlocked!');
+          playOpen();
+          grantXP(30,'Unlocked Ender Chest');
+        }
+      } else if(base === '/dance'){
+        // Nether mode toggle for 12s
+        mode = 'nether'; spawnParticles(90);
+        showAchievement('Dance mode: Nether Portal!');
+        playXP(); playAchievement();
+        setTimeout(()=>{ mode='normal'; spawnParticles(60); pushTerminal('Dance finished.'); },12000);
+        grantXP(12,'Danced');
+      } else if(base === '/clear'){
+        terminal.innerHTML = '';
+      } else if(base === '/seed'){
+        const seed = Math.floor(Math.random()*999999999);
+        pushTerminal('World seed: ' + seed);
+        grantXP(4,'Generated Seed');
+      } else {
+        pushTerminal('Unknown command ❌ (type /help)');
+      }
+    }
+
+    sendBtn.addEventListener('click', ()=>{ handleCommand(input.value); input.value=''; input.focus() });
+    input.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ handleCommand(input.value); input.value=''; } });
+
+    // initial welcome messages
+    (function bootMessages(){
+      pushTerminal('> Connecting to ARI’s Server...');
+      setTimeout(()=>{ pushTerminal('> Login successful!'); },500);
+      setTimeout(()=>{ pushTerminal('> Type /help for available commands.'); },900);
+    })();
+
+    /* -------------------------
+       Interactions: clicking slots, scrolling => XP & achievements
+       ------------------------- */
+    document.querySelectorAll('.project').forEach(el=>{
+      el.addEventListener('click', (e)=>{
+        // if anchor link - allow default navigation but grant XP
+        const name = el.dataset.name || el.textContent.trim();
+        grantXP(12, `Interacted with ${name}`);
+        showAchievement(`Interacted: ${name}`);
+        playOpen();
+      });
+      el.addEventListener('mouseenter', ()=> playXP());
+    });
+
+    // scroll achievements
+    let scrolledProjects=false;
+    window.addEventListener('scroll', ()=>{
+      const proj = document.getElementById('projects');
+      const rect = proj.getBoundingClientRect();
+      if(rect.top < innerHeight*0.8 && !scrolledProjects){
+        scrolledProjects = true;
+        grantXP(10,'Scrolled to Projects');
+        showAchievement('Discovered Inventory!');
+      }
+    });
+
+    // Show achievements list button
+    const showAchievementsBtn = document.getElementById('showAchievements');
+    showAchievementsBtn.addEventListener('click', ()=>{
+      const ach = state.achievements;
+      const list = Object.keys(ach).length ? Object.keys(ach).map(k => `• ${k}`).join('\n') : 'No achievements yet.';
+      pushTerminal('Achievements:\n' + list);
+      grantXP(6,'Checked Achievements');
+    });
+
+    // Reset progress (for testing)
+    document.getElementById('resetProgress').addEventListener('click', ()=>{
+      if(confirm('Reset local progress?')){
+        state = {xp:0,level:1,achievements:{}};
+        document.getElementById('enderChest').classList.remove('show');
+        saveState(); updateXPUI();
+        pushTerminal('Progress reset.');
+      }
+    });
+
+    /* -------------------------
+       Server mock: update players and ping every few seconds
+       ------------------------- */
+    const names = ['Explorer42','CoderCat','BlockSmith','Guest','NetRunner','ARI','PixelPunk'];
+    function updateServerMock(){
+      const count = Math.floor(1 + Math.random()*6); // 1-6
+      const players = [];
+      while(players.length < count){
+        const pick = names[Math.floor(Math.random()*names.length)];
+        if(!players.includes(pick)) players.push(pick);
+      }
+      document.getElementById('playersCount').textContent = count;
+      document.getElementById('playerList').textContent = players.join(', ');
+      const ping = 20 + Math.floor(Math.random()*120);
+      document.getElementById('ping').textContent = ping + 'ms';
+    }
+    updateServerMock(); setInterval(updateServerMock, 5000);
+
+    /* -------------------------
+       Achievement for first visit (if not given)
+       ------------------------- */
+    if(!state.achievements['welcome']){
+      state.achievements['welcome'] = true;
+      saveState();
+      showAchievement('Welcome Explorer');
+      playAchievement();
+      grantXP(15,'First Visit');
+    }
+
+    /* -------------------------
+       Simple click sound and download action for CV button
+       ------------------------- */
+    document.querySelectorAll('.slot').forEach(s=>{
+      s.addEventListener('click',(e)=>{
+        // If this is download CV slot (check icon class)
+        if(s.querySelector('.fa-download')){
+          playOpen();
+          // simulate download by opening data URL with small resume text
+          const blob = new Blob([`ARI — Resume\n\nFull Stack Dev · Portfolio: ARI\n\n(Download simulation)`], {type:'text/plain'});
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a'); a.href=url; a.download='ARI_Resume.txt'; document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(()=>URL.revokeObjectURL(url),2000);
+        }
+      });
+    });
+
+    /* -------------------------
+       Simple seed to persist the Ender chest display if previously unlocked
+       ------------------------- */
+    if(state.achievements['enderUnlocked']){
+      document.getElementById('enderChest').classList.add('show');
+    } else {
+      document.getElementById('enderChest').classList.add('hidden');
+    }
+
+    /* -------------------------
+       Small UX: clicking nav anchors will grant small XP
+       ------------------------- */
+    document.querySelectorAll('nav a').forEach(a=>{
+      a.addEventListener('click', ()=> grantXP(4,'Used Nav'));
+    });
+
+    /* -------------------------
+       Extra: clicking on player avatar gives secret XP
+       ------------------------- */
+    document.querySelector('#profile img').addEventListener('click', ()=>{
+      grantXP(20,'Pet the Avatar');
+      showAchievement('You petted ARI!');
+    });
+
+    /* -------------------------
+       Allow pressing Enter anywhere to focus terminal input
+       ------------------------- */
+    window.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter' && document.activeElement !== input){
+        input.focus();
+      }
+    });
+  </script>
+</body>
+</html>
